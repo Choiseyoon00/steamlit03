@@ -13,7 +13,7 @@ if client is None:
 assistant = client.beta.assistants.create(
     instructions = "you are a chatbot",
     model = "gpt-4-turbo",
-    tools = tools
+    # tools = tools
 )
 thread = client.beta.threads.create(
   messages=[
