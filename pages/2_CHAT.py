@@ -1,9 +1,7 @@
-!pip install streamlit_chat
-from streamlit_chat import message
 
 import streamlit as st
 import numpy as np
-
+from streamlit_chat import message
 
 
 if prompt := st.chat_input("What is up?"):
