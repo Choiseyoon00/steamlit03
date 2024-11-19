@@ -34,5 +34,5 @@ if prompt:
 
 
 
- if "messages" not in st.session_state: ##메모리 초기화
+ if "messages" not in st.session_state:
    with st.session_state.messages = [] 
