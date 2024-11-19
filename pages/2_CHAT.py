@@ -4,9 +4,11 @@ import numpy as np
 from streamlit_chat import message
 from openai import OpenAI
 
-api_key = st.text_input("OpenAI API Key", type='password')
-
-client = OpenAI(api_key=api_key)
+client = st.session_state.get('openai_client', None)
+if client is None:
+    if st.button("API Key를 입력하세요."):
+        st.switch_page("pages/1_Setting.py")
+    st.stop()
 
 assistant = client.beta.assistants.create(
     instructions = "you are a chatbot",
