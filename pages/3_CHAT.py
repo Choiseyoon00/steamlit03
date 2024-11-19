@@ -22,7 +22,7 @@ thread = client.beta.threads.create(
 )
 
 prompt = st.chat_input("Say something")
- with st.chat_message("user"):
+ #with st.chat_message("user"):
 
 
 
