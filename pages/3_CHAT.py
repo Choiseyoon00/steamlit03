@@ -11,19 +11,44 @@ if client is None:
     st.stop()
 
 assistant = client.beta.assistants.create(
-    instructions = "you are a chatbot",
-    model = "gpt-4-turbo",
-    # tools = tools
+  name="chatbot",
+  instructions="you are a chatbot.",
+  model="gpt-4o-mini"
 )
+
 thread = client.beta.threads.create(
   messages=[
     {
-        "role":"user",
-        # "content": "다음 이차방정식의 해를 구해줘: 15x^2 - 2x+1.2=0"
+      "role": "user",
+      "content": "you are a chatbot."
     }
   ]
 )
 
+while True:
+  # 사용자 입력
+  user_msg = input("user: ")
+  if user_msg == 'STOP':
+    break
+
+  new_message = client.beta.threads.messages.create(
+    thread_id = thread.id,
+    role="user",
+    content=user_msg
+  )
+
+  run = client.beta.threads.runs.create_and_poll(
+    thread_id=thread.id,
+    assistant_id=assistant.id,
+    poll_interval_ms=2000
+  )
+  if run.status in ['expired','failed','cancelled','incomplete']:
+    print("Error:", run.status)
+    break
+
+  thread_messages = client.beta.threads.messages.list(thread.id, limit=1)
+  for msg in thread_messages.data:
+    print(f"{msg.role}: {msg.content[0].text.value}")
 
 
 
