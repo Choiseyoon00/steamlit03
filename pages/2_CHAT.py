@@ -4,5 +4,6 @@ import numpy as np
 from streamlit_chat import message
 
 
-prompt = st.chat_input("Say something")
-if prompt: with st.chat_message("user"):
+if prompt := st.chat_input("What is up?"):
+  st.chat_message("user").markdown(prompt) 
+  st.session_state.messages.append({"role": "user", "content": prompt}) 
