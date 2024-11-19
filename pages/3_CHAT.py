@@ -34,5 +34,5 @@ if prompt:
 
 
 
- if "messages" not in st.session_state:
+if "messages" not in st.session_state:
    with st.session_state.messages = [] 
