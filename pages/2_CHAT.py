@@ -1,4 +1,3 @@
-!pip install streamlit-chat 
 
 import streamlit as st
 import numpy as np
