@@ -2,7 +2,9 @@
 import streamlit as st
 import numpy as np
 from streamlit_chat import message
+from openai import OpenAI
 
+client = OpenAI(api_key="sk-")
 
 assistant = client.beta.assistants.create(
     instructions = "you are a chatbot",
