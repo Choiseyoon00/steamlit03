@@ -6,30 +6,9 @@ from openai import OpenAI
 
 client = st.session_state.get('openai_client', None)
 
-assistant = client.beta.assistants.create(
-  name="chatbot",
-  instructions="you are a chatbot.",
-  model="gpt-4o-mini"
-)
 
-thread = client.beta.threads.create(
-  messages=[
-    {
-      "role": "user",
-      "content": "you are a chatbot."
-    }
-  ]
-)
-
-prompt = st.chat_input("Say something")
- #with st.chat_message("user"):
-
-
-
-
-
-
-
+message("My message") 
+message("Hello bot!", is_user=True)  # align's the message to the right
 
 
 
