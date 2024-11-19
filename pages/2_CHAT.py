@@ -1,6 +1,10 @@
+!pip install streamlit-chat 
+
 import streamlit as st
+import numpy as np
 from streamlit_chat import message
 
-message("My message") 
-message("Hello bot!", is_user=True)  # align's the message to the right
 
+prompt = st.chat_input("Say something")
+if prompt:
+    with st.chat_message("user"):
