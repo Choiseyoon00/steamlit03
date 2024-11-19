@@ -7,6 +7,10 @@ from openai import OpenAI
 client = st.session_state.get('openai_client', None)
 
 
+def query(payload):
+	response = requests.post(API_URL, headers=headers, json=payload)
+	return response.json()
+
 def get_text():
     input_text = st.text_input("You: ","Hello, how are you?", key="input")
     return input_text 
