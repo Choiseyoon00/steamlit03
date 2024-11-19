@@ -16,7 +16,3 @@ if prompt := st.chat_input("What is up?"):
 
 if "messages" not in st.session_state: ##메모리 초기화
  st.session_state.messages = [] 
-
-for msg in st.session_state.messages: ##메세지 구분
- with st.chat_message(msg["role"]):
-   st.markdown(msg["content"])
