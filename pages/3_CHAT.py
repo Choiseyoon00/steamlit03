@@ -34,4 +34,4 @@ prompt = st.chat_input("Say something")
 
 
 if "messages" not in st.session_state:
-   with st.session_state.messages = [] 
+ st.session_state.messages = [] 
