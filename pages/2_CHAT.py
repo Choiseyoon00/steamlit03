@@ -5,4 +5,4 @@ from streamlit_chat import message
 
 
 prompt = st.chat_input("Say something")
-if prompt:with st.chat_message("user"):
+if prompt: with st.chat_message("user"):
