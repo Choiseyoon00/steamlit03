@@ -5,10 +5,6 @@ from streamlit_chat import message
 from openai import OpenAI
 
 client = st.session_state.get('openai_client', None)
-if client is None:
-    if st.button("API Key를 입력하세요."):
-        st.switch_page("pages/1_Setting.py")
-    st.stop()
 
 assistant = client.beta.assistants.create(
   name="chatbot",
