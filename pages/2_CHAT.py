@@ -1,6 +1,7 @@
 
 import streamlit as st
 import numpy as np
+!pip install streamlit_chat
 from streamlit_chat import message
 
 
