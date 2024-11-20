@@ -473,7 +473,7 @@ if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요
 
     # OpenAI API 호출
     try:
-        response = client.ChatCompletion.create(
+        response = client.chat.completion.create(
             model="gpt-4",
             messages=st.session_state.messages
         )
