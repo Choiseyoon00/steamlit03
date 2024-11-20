@@ -471,3 +471,19 @@ if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요
     st.session_state.messages.append(user_message)
     st.chat_message("user").markdown(prompt)
 
+try:
+    response = client.ChatCompletion.create(
+        model="gpt-4",
+        messages=st.session_state.messages
+    )
+    # 반환값에서 content 추출
+    assistant_reply = response["choices"][0]["message"]["content"]
+    
+    # 메시지 저장
+    assistant_message = {"role": "assistant", "content": assistant_reply}
+    st.session_state.messages.append(assistant_message)
+    st.chat_message("assistant").markdown(assistant_reply)
+except KeyError:
+    st.error("API 응답 데이터 형식이 예상과 다릅니다.")
+except openai.error.OpenAIError as e:
+    st.error(f"OpenAI API 호출 중 오류가 발생했습니다: {e}")
