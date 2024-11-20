@@ -483,7 +483,9 @@ try:
     assistant_message = {"role": "assistant", "content": assistant_reply}
     st.session_state.messages.append(assistant_message)
     st.chat_message("assistant").markdown(assistant_reply)
-except KeyError:
-    st.error("API 응답 데이터 형식이 예상과 다릅니다.")
-except openai.error.OpenAIError as e:
-    st.error(f"OpenAI API 호출 중 오류가 발생했습니다: {e}")
+except openai.error.AuthenticationError:
+    st.error("API Key가 올바르지 않습니다. 다시 입력하세요.")
+except openai.error.RateLimitError:
+    st.error("API 호출 제한을 초과했습니다. 잠시 후 다시 시도하세요.")
+except openai.error.InvalidRequestError as e:
+    st.error(f"요청이 잘못되었습니다: {e}")
