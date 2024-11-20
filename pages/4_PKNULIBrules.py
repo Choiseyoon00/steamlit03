@@ -426,7 +426,10 @@ if client is None:
     st.stop()
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "다음은 국립부경대학교 도서관 규정입니다:"},
+        {"role": "system", "content": library_regulations},
+    ]
 
 if "assistant" not in st.session_state:
     st.session_state.assistant = client.chat.completions.create(
@@ -463,57 +466,22 @@ for msg in st.session_state.messages:
 
 # user prompt, assistant response
 if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요."):
-    msg = {"role":"user", "content":prompt}
-    show_message(msg)
-    st.session_state.messages.append(msg)
+    # 사용자 메시지 추가
+    user_message = {"role": "user", "content": prompt}
+    st.session_state.messages.append(user_message)
+    st.chat_message("user").markdown(prompt)
 
-    # assistant api - get response
-    thread = st.session_state.thread
-    assistant = st.session_state.assistant
-
-    client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=prompt
-    )
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread.id,
-        assistant_id=assistant.id
-    )
-
-    while run.status == 'requires_action':
-        tool_calls = run.required_action.submit_tool_outputs.tool_calls
-        tool_outputs = []
-        for tool in tool_calls:
-            func_name = tool.function.name
-            kwargs = json.loads(tool.function.arguments)
-            output = None
-            if func_name in TOOL_FUNCTIONS:
-                output = TOOL_FUNCTIONS[func_name](**kwargs)
-            tool_outputs.append(
-                {
-                    "tool_call_id": tool.id,
-                    "output": str(output)
-                }
-            )
-        run = client.beta.threads.runs.submit_tool_outputs_and_poll(
-            thread_id=thread.id,
-            run_id=run.id,
-            tool_outputs=tool_outputs
+    # OpenAI API 호출
+    try:
+        response = client.ChatCompletion.create(
+            model="gpt-4",
+            messages=st.session_state.messages
         )
-            
-    # assistant messages - text, image_url, image_file
-    if run.status == 'completed':
-        api_response = client.beta.threads.messages.list(
-            thread_id=thread.id,
-            run_id=run.id,
-            order="asc"
-        )
-        for data in api_response.data:
-            for content in data.content:
-                if content.type == 'text':
-                    response = content.text.value
-                    msg = {"role":"assistant","content":response}
-                show_message(msg)
-                st.session_state.messages.append(msg)
+        assistant_reply = response["choices"][0]["message"]["content"]
 
+        # Assistant 메시지 추가
+        assistant_message = {"role": "assistant", "content": assistant_reply}
+        st.session_state.messages.append(assistant_message)
+        st.chat_message("assistant").markdown(assistant_reply)
+    except Exception as e:
+        st.error(f"OpenAI API 호출 중 오류가 발생했습니다: {e}")
