@@ -473,7 +473,7 @@ if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요
 
 try:
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o-mini",
         messages=st.session_state.messages
     )
     # 반환값에서 content 추출
