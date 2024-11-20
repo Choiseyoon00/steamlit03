@@ -429,7 +429,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "assistant" not in st.session_state:
-    st.session_state.assistant = openai.ChatCompletion.create(
+    st.session_state.assistant = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "다음은 국립부경대학교 도서관 규정입니다:"},
