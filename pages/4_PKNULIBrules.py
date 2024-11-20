@@ -483,6 +483,6 @@ try:
     assistant_message = {"role": "assistant", "content": assistant_reply}
     st.session_state.messages.append(assistant_message)
     st.chat_message("assistant").markdown(assistant_reply)
-except openai.error:
-    st.error("API Key가 올바르지 않습니다. 다시 입력하세요.")
-    
+finally:
+    # 항상 실행
+    print("프로그램이 종료되었습니다.")
