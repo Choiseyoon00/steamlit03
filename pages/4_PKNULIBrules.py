@@ -429,13 +429,13 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "assistant" not in st.session_state:
-    st.session_state.assistant = client.chat.completions.create(
-  model="gpt-4o-mini",
-  messages=[
-        {"role": "system", "content": "다음은 국립부경대학교 도서관 규정입니다:"},
-        {"role": "system", "content": library_regulations},
-    ]
-)
+    st.session_state.assistant = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "다음은 국립부경대학교 도서관 규정입니다:"},
+            {"role": "system", "content": library_regulations},
+        ],
+    )
 
 
 if "thread" not in st.session_state:
