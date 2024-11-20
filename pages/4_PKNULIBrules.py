@@ -1,4 +1,5 @@
 import streamlit as st
+import openai
 import json
 
 library_regulations = """
@@ -408,6 +409,9 @@ library_regulations = """
 제4조(다른 규정의 개정) 본교 제 규정의 제명 및 내용 중 “부경대학교”는 “국립부경대학교”로 한다.
 """
 
+st.title("국립부경대학교 도서관 규정 Q&A")
+
+
 def show_message(msg):
     if msg['role'] == 'user' or msg['role'] == 'assistant':
         with st.chat_message(msg['role']):
@@ -458,7 +462,7 @@ for msg in st.session_state.messages:
     show_message(msg)
 
 # user prompt, assistant response
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요."):
     msg = {"role":"user", "content":prompt}
     show_message(msg)
     st.session_state.messages.append(msg)
