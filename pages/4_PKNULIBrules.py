@@ -479,9 +479,11 @@ if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요
         )
         assistant_reply = response["choices"][0]["message"]["content"]
 
-        # Assistant 메시지 추가
+        # 메시지 저장
         assistant_message = {"role": "assistant", "content": assistant_reply}
         st.session_state.messages.append(assistant_message)
         st.chat_message("assistant").markdown(assistant_reply)
-    except Exception as e:
+    except KeyError:
+        st.error("API 응답 데이터 형식이 예상과 다릅니다.")
+    except openai.error.OpenAIError as e:
         st.error(f"OpenAI API 호출 중 오류가 발생했습니다: {e}")
