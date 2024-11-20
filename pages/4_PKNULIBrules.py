@@ -472,7 +472,7 @@ if prompt := st.chat_input("도서관 규정에 대한 질문을 입력하세요
     st.chat_message("user").markdown(prompt)
 
 try:
-    response = client.chatcompletion.create(
+    response = client.chatcompletions.create(
         model="gpt-4",
         messages=st.session_state.messages
     )
