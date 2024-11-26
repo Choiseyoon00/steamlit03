@@ -23,8 +23,14 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# 지도 생성
+# Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
+
+# Folium 지도 HTML로 저장하기
+with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as tmp_file:
+    m.save(tmp_file.name)
+    map_html_path = tmp_file.name
+
 
 st.title("부동산 챗봇")
 
@@ -65,12 +71,13 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "assistant" not in st.session_state:
+    # 이제 HTML 경로를 `tool_resources`에 추가하여 전달
     st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
         instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가 입니다.",
         model="gpt-4o-mini",
-        tools=[{"type":"code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
-        tool_resources=folium.Map(location=[pknu_latitude, pknu_longitude]),
+        tools=[{"type": "code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
+        tool_resources={"map_html": map_html_path},
     )
 
 if "thread" not in st.session_state:
