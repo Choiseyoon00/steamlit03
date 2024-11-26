@@ -24,6 +24,7 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
+st.title("부동산 챗봇")
 
 # Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
@@ -35,9 +36,6 @@ out = st_folium(
     width=1200,
     height=500,
 )
-
-
-st.title("부동산 챗봇")
 
 
 TOOL_FUNCTIONS = {
