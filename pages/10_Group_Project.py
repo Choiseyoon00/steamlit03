@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import openai
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
+from lib.tools import update_map, UPDATE_MAP
 
 # 부경대 좌표
 pknu_latitude = 35.1329

@@ -11,6 +11,17 @@ def generate_image(prompt):
     )
     return response.data[0].url
 
+
+def update_map_state(latitude, longitude, zoom):
+    """OpenAI tool to update map in-app
+    """
+    st.session_state[map_state] = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "zoom": zoom,
+    }
+    return "Map updated"
+
 SCHEMA_GENERATE_IMAGE = {
     "type":"function",
     "function": {
