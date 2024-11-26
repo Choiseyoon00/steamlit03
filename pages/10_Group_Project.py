@@ -61,7 +61,7 @@ for i in range(len(pknu_boundary_coords)):
 
     # 두 점을 향해 25미터씩 이동
     expanded_point = distance(meters=25).destination((current_point[0]))
-#
+    
 
 out = st_folium(
     m,
