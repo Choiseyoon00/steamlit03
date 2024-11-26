@@ -1,5 +1,5 @@
 openai
-streamlit_chat
+streamlit
 streamlit-folium
 geopy
 shapely
