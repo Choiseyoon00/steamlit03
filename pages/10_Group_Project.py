@@ -24,6 +24,9 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
+# 지도 생성
+m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
+
 st.title("부동산 챗봇")
 
 
@@ -68,7 +71,7 @@ if "assistant" not in st.session_state:
         instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가 입니다.",
         model="gpt-4o-mini",
         tools=[{"type":"code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
-        tool_resources={"code_interpreter":{"file_ids":[my_file.id]}},
+        tool_resources=m,
     )
 
 if "thread" not in st.session_state:
