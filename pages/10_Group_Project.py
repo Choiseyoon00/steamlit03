@@ -24,7 +24,7 @@ pknu_boundary_coords = [
 ]
 
 # 지도 생성
-m = folium.Map(location=center_coords, zoom_start=15)
+m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
 
 #클릭하면 좌표 표시
 m.add_child(folium.LatLngPopup()) 
