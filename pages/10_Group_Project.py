@@ -23,12 +23,13 @@ pknu_boundary_coords = [
     [35.13540614195955, 129.10087862006972]   # 다시 시작점으로
 ]
 
-# 지도 생성, 부경대 마커
+# 지도 생성
 m = folium.Map(location=center_coords, zoom_start=15)
 
 #클릭하면 좌표 표시
 m.add_child(folium.LatLngPopup()) 
 
+#부경대 마커
 folium.Marker(
   location=[pknu_latitude, pknu_longitude],
   popup=pknu,
@@ -37,10 +38,10 @@ folium.Marker(
 
 st_data = st_folium(m, width=725)
 
-#점선 추가
+#부경대 부지 경계 점선
 folium.PolyLine(
     locations=pknu_boundary_coords,  # 경계선 좌표
-    color="red",  # 선 색깔
+    color="blue",  # 선 색깔
     weight=10,      # 선 두께
     dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
 ).add_to(m)
