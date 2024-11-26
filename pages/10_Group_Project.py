@@ -22,11 +22,8 @@ pknu_boundary_coords = [
     [35.13540614195955, 129.10087862006972]   # 다시 시작점으로
 ]
 
-# center on PKNU, add marker
-m = folium.Map(
-    location=[pknu_latitude, pknu_longitude],
-    zoom_start=15
-)
+
+
 
 #클릭하면 좌표 표시
 m.add_child(folium.LatLngPopup()) 
@@ -47,4 +44,8 @@ folium.PolyLine(
     dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
 ).add_to(m)
 
-m
+# center on PKNU, add marker
+m = folium.Map(
+    location=[pknu_latitude, pknu_longitude],
+    zoom_start=15
+)
