@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import openai
 import json
+import geopandas as gpd
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 
 # 부경대 좌표와 지도에서 표시
@@ -73,7 +74,7 @@ if "assistant" not in st.session_state:
     # HTML 경로를 `tool_resources`에 추가하여 전달
         st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
-        instructions=instructions,
+        instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 좌표 데이터를 기반으로 Folium 지도를 생성하세요.",
         model="gpt-4o-mini",
         tools=[{"type": "code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
         tool_resources={"boundary_coordinates": pknu_boundary_coords_json},
