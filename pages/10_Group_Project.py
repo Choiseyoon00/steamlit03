@@ -82,7 +82,7 @@ if "thread" not in st.session_state:
 if "map_state" not in st.session_state:
     st.session_state[map_state] = {
         "latitude": pknu_latitude,
-        "longitude": pknu_longtitude,
+        "longitude": pknu_longitude,
         "zoom": 15,
     }
 
