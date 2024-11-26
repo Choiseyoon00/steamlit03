@@ -1,5 +1,4 @@
 #https://folium.streamlit.app/
-streamlit cache clear
 
 import folium
 import streamlit as st
