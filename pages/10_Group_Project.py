@@ -4,6 +4,7 @@ from streamlit_folium import st_folium
 import openai
 import json
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
+import geopandas as gpd
 
 
 # 부경대 좌표와 지도에서 표시
@@ -24,14 +25,20 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# 부경대 부지 경계선 좌표를 JSON으로 변환
-pknu_boundary_coords_json = json.dumps(pknu_boundary_coords)
+# shp 파일 불러오기
+shapefile_path = "example.shp"
+gdf = gpd.read_file(shapefile_path)
+
 
 # Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
 
-# Folium 지도 HTML로 변환하기
-map_html = m._repr_html_()
+# shp 파일을 지도에 추가
+folium.GeoJson(gdf).add_to(m)
+
+# HTML 파일로 저장
+map.save("map.html")
+
 
 st.title("부동산 챗봇")
 
@@ -43,14 +50,6 @@ TOOL_FUNCTIONS = {
 FUNCTION_TOOLS_SCHEMA = [
     SCHEMA_GENERATE_IMAGE
 ]
-
-instructions = f"""
-당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 
-아래 좌표를 사용하여 부경대학교의 부지를 Folium으로 시각화하세요.
-
-경계선 좌표:
-{pknu_boundary_coords}
-"""
 
 def show_message(msg):
     if msg['role'] == 'user' or msg['role'] == 'assistant':
@@ -80,7 +79,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "assistant" not in st.session_state:
-    # 이제 HTML 경로를 `tool_resources`에 추가하여 전달
+    # HTML 경로를 `tool_resources`에 추가하여 전달
         st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
         instructions=instructions,
