@@ -4,6 +4,7 @@ from streamlit_folium import st_folium
 import openai
 import json
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
+import tempfile
 
 # 부경대 좌표와 지도에서 표시
 pknu_latitude = 35.1329
