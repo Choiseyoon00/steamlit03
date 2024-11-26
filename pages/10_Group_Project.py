@@ -3,6 +3,7 @@
 import folium
 import streamlit as st
 from streamlit_folium import st_folium
+from geopy.distance import distance
 
 
 #부경대 좌표와 지도에서 표시
@@ -46,6 +47,20 @@ folium.Polygon(
     fill_color='blue',  # 채우기 색상
     fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
+
+# 부경대 바깥 경계 좌표 생성 (각 좌표에서 25m 떨어진 곳)
+expanded_boundary_coords = []
+for i in range(len(pknu_boundary_coords)):
+    current_point = pknu_boundary_coords[i]
+    next_point = pknu_boundary_coords[(i + 1) % len(pknu_boundary_coords)]
+
+    # 두 점 사이의 중간 방향으로 25m 이동
+    mid_point_lat = (current_point[0] + next_point[0]) / 2
+    mid_point_lon = (current_point[1] + next_point[1]) / 2
+    mid_point = [mid_point_lat, mid_point_lon]
+
+    # 두 점을 향해 25미터씩 이동
+    expanded_point = distance(meters=25).destination((current_point[0]
 
 
 out = st_folium(
