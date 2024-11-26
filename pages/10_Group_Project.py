@@ -8,6 +8,7 @@ from streamlit_folium import st_folium
 #부경대 좌표와 지도에서 표시
 pknu_latitude = 35.134080249513474
 pknu_longitude = 129.10317348438963
+center_coords = [pknu_latitude, pknu_longitude]
 pknu = "Pukyong National University - Daeyeon Campus"
 
 # 부경대학교 부지 경계선 좌표
@@ -22,8 +23,8 @@ pknu_boundary_coords = [
     [35.13540614195955, 129.10087862006972]   # 다시 시작점으로
 ]
 
-
-
+# 지도 생성, 부경대 마커
+m = folium.Map(location=center_coords, zoom_start=15)
 
 #클릭하면 좌표 표시
 m.add_child(folium.LatLngPopup()) 
@@ -43,9 +44,3 @@ folium.PolyLine(
     weight=10,      # 선 두께
     dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
 ).add_to(m)
-
-# center on PKNU, add marker
-m = folium.Map(
-    location=[pknu_latitude, pknu_longitude],
-    zoom_start=15
-)
