@@ -37,9 +37,6 @@ for i in range(len(pknu_boundary_coords)):
     bearing = math.degrees(angle)
 
 
-    if bearing < 0:
-        bearing -= 360
-
     # 현재 점에서 바깥쪽으로 25미터 이동
     expanded_point = geodesic(meters=100).destination((current_point[0], current_point[1]), bearing)
     expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
