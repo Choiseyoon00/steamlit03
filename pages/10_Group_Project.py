@@ -1,9 +1,8 @@
 import folium
 import streamlit as st
 from streamlit_folium import st_folium
-from shapely.geometry import Polygon
-from shapely.ops import transform
-from pyproj import Transformer
+from geopy.distance import geodesic
+import math
 
 # 부경대 좌표와 지도에서 표시
 pknu_latitude = 35.1329
@@ -23,21 +22,27 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# Shapely를 사용하여 다각형 생성
-polygon = Polygon(pknu_boundary_coords)
+# 바깥 경계선 좌표 생성 (각 좌표에서 25m 바깥으로 이동)
+expanded_boundary_coords = []
 
-# 좌표 변환 함수 (거리 단위를 미터로 사용하기 위해)
-# pyproj의 Transformer를 사용하여 간단히 좌표 변환 설정
-transformer_to_utm = Transformer.from_crs('EPSG:4326', 'EPSG:32652', always_xy=True)
-transformer_to_wgs84 = Transformer.from_crs('EPSG:32652', 'EPSG:4326', always_xy=True)
+for i in range(len(pknu_boundary_coords)):
+    # 현재 좌표와 다음 좌표
+    current_point = pknu_boundary_coords[i]
+    next_point = pknu_boundary_coords[(i + 1) % len(pknu_boundary_coords)]
 
-# UTM 좌표계로 변환하여 다각형을 25미터 확장
-polygon_utm = transform(transformer_to_utm.transform, polygon)
-expanded_polygon_utm = polygon_utm.buffer(25)
-expanded_polygon = transform(transformer_to_wgs84.transform, expanded_polygon_utm)
+    # 현재 좌표에서 다음 좌표로 가는 방향의 각도 계산
+    delta_lat = next_point[0] - current_point[0]
+    delta_lon = next_point[1] - current_point[1]
+    angle = math.atan2(delta_lat, delta_lon)
+    bearing = math.degrees(angle)
 
-# 바깥 경계 좌표 리스트로 변환
-expanded_boundary_coords = list(expanded_polygon.exterior.coords)
+    # 각도가 음수인 경우 양수로 변환
+    if bearing < 0:
+        bearing += 360
+
+    # 현재 점에서 바깥쪽으로 25미터 이동
+    expanded_point = geodesic(meters=100).destination((current_point[0], current_point[1]), bearing)
+    expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
 
 # 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
@@ -52,7 +57,7 @@ folium.Marker(
     icon=folium.Icon(color='red', icon='star')
 ).add_to(m)
 
-# 부경대 부지 경계 점선 추가 (파란색)
+# 부경대 부지 경계 점선 추가
 folium.Polygon(
     locations=pknu_boundary_coords,  # 경계선 좌표
     color="blue",  # 선 색깔
@@ -63,7 +68,7 @@ folium.Polygon(
     fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
-# 바깥 경계 점선 추가 (확장된 경계선, 초록색)
+# 바깥 경계 점선 추가 (확장된 경계선)
 folium.Polygon(
     locations=expanded_boundary_coords,  # 바깥 경계선 좌표
     color="green",  # 선 색깔
@@ -71,6 +76,7 @@ folium.Polygon(
     dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
     fill=False      # 바깥 경계는 채우지 않음
 ).add_to(m)
+
 
 # 최종 지도를 Streamlit에 표시
 out = st_folium(
