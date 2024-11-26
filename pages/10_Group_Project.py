@@ -26,9 +26,6 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# 지도 생성
-m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
-
 
 #---Shapely---------------
 
@@ -50,6 +47,15 @@ expanded_polygon = transform(reproject, expanded_polygon_utm)
 expanded_boundary_coords = list(expanded_polygon.exterior.coords)
 
 #---Shapely----------------
+
+
+
+
+# 지도 생성
+m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
+
+
+
 
 
 
