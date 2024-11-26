@@ -2,6 +2,7 @@
 
 import folium
 import streamlit as st
+import math
 from streamlit_folium import st_folium
 from geopy.distance import distance
 from geopy.distance import geodesic
@@ -49,20 +50,24 @@ folium.Polygon(
     fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
-# 바깥 경계선 좌표 생성 (각 좌표에서 25m 바깥으로 이동)
+
+
+
+# 바깥 경계선 좌표 생성 (각 점에서 25m 바깥으로 이동)
 expanded_boundary_coords = []
 
 for i in range(len(pknu_boundary_coords)):
     current_point = pknu_boundary_coords[i]
     previous_point = pknu_boundary_coords[i - 1]
 
-    # 두 점 사이의 방향 계산 (중간 지점과 각도를 이용하여 바깥으로 이동)
-    midpoint_lat = (current_point[0] + previous_point[0]) / 2
-    midpoint_lon = (current_point[1] + previous_point[1]) / 2
-    midpoint = (midpoint_lat, midpoint_lon)
+    # 두 점 사이의 방향 계산 (중심 각도를 이용해 바깥으로 이동)
+    delta_lat = current_point[0] - previous_point[0]
+    delta_lon = current_point[1] - previous_point[1]
+    angle = math.atan2(delta_lat, delta_lon)  # 두 점 사이의 각도 계산
+    bearing = math.degrees(angle) + 90  # 외곽으로 이동하기 위해 90도 회전
 
     # 각 점을 바깥쪽으로 25미터 이동
-    expanded_point = geodesic(meters=25).destination(midpoint, bearing=90)  # 예를 들어 동쪽으로 25m 이동
+    expanded_point = geodesic(meters=25).destination((current_point[0], current_point[1]), bearing)
     expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
 
 # 바깥 경계 점선 추가
