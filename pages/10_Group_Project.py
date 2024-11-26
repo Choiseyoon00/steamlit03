@@ -78,15 +78,13 @@ expanded_boundary_coords = list(expanded_polygon.exterior.coords)
 
 #---Shapely----------------
 
-# 바깥 경계 점선 추가
+# 바깥 경계 점선 추가 (확장된 경계선)
 folium.Polygon(
     locations=expanded_boundary_coords,  # 바깥 경계선 좌표
-    color="red",  # 선 색깔
-    weight=3,      # 선 두께
+    color="green",  # 선 색깔
+    weight=3,       # 선 두께
     dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
-    fill=True,  # 폴리곤 내부 채우기 설정
-    fill_color='red',  # 채우기 색상
-    fill_opacity=0.3  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
+    fill=False      # 바깥 경계는 채우지 않음
 ).add_to(m)
 
 
