@@ -48,7 +48,7 @@ folium.Polygon(
     fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
-# 부경대 바깥 경계 좌표 생성 (각 좌표에서 25m 떨어진 곳)
+# 바깥 경계 좌표 생성 (각 좌표에서 25m 떨어진 곳)
 expanded_boundary_coords = []
 for i in range(len(pknu_boundary_coords)):
     current_point = pknu_boundary_coords[i]
@@ -60,8 +60,7 @@ for i in range(len(pknu_boundary_coords)):
     mid_point = [mid_point_lat, mid_point_lon]
 
     # 두 점을 향해 25미터씩 이동
-    expanded_point = distance(meters=25).destination((current_point[0]))
-
+    expanded_point = distance(meters=25).destination((current_point[0]
 
 out = st_folium(
     m,
