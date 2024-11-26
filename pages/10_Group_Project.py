@@ -4,8 +4,6 @@ from streamlit_folium import st_folium
 import openai
 import json
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
-import geopandas as gpd
-
 
 # 부경대 좌표와 지도에서 표시
 pknu_latitude = 35.1329
@@ -25,19 +23,12 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# shp 파일 불러오기
-shapefile_path = "example.shp"
-gdf = gpd.read_file(shapefile_path)
-
 
 # Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
 
-# shp 파일을 지도에 추가
-folium.GeoJson(gdf).add_to(m)
 
-# HTML 파일로 저장
-map.save("map.html")
+
 
 
 st.title("부동산 챗봇")
