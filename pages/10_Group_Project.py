@@ -36,8 +36,6 @@ folium.Marker(
   icon=folium.Icon(color='red',icon='star')
 ).add_to(m)
 
-st_data = st_folium(m, width=725)
-
 #부경대 부지 경계 점선
 folium.PolyLine(
     locations=pknu_boundary_coords,  # 경계선 좌표
