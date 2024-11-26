@@ -3,7 +3,7 @@ import streamlit as st
 from streamlit_folium import st_folium
 from shapely.geometry import Polygon
 from shapely.ops import transform
-import pyproj
+from pyproj import Transformer
 
 # 부경대 좌표와 지도에서 표시
 pknu_latitude = 35.1329
@@ -27,15 +27,14 @@ pknu_boundary_coords = [
 polygon = Polygon(pknu_boundary_coords)
 
 # 좌표 변환 함수 (거리 단위를 미터로 사용하기 위해)
-proj_wgs84 = pyproj.CRS('EPSG:4326')
-proj_utm = pyproj.CRS('EPSG:32652')  # 한국 지역에 적합한 UTM 좌표계 (부산 기준)
-project = pyproj.Transformer.from_crs(proj_wgs84, proj_utm, always_xy=True).transform
-reproject = pyproj.Transformer.from_crs(proj_utm, proj_wgs84, always_xy=True).transform
+# pyproj의 Transformer를 사용하여 간단히 좌표 변환 설정
+transformer_to_utm = Transformer.from_crs('EPSG:4326', 'EPSG:32652', always_xy=True)
+transformer_to_wgs84 = Transformer.from_crs('EPSG:32652', 'EPSG:4326', always_xy=True)
 
-# UTM 좌표계로 변환하여 다각형을 10미터 확장
-polygon_utm = transform(project, polygon)
-expanded_polygon_utm = polygon_utm.buffer(10)
-expanded_polygon = transform(reproject, expanded_polygon_utm)
+# UTM 좌표계로 변환하여 다각형을 25미터 확장
+polygon_utm = transform(transformer_to_utm.transform, polygon)
+expanded_polygon_utm = polygon_utm.buffer(25)
+expanded_polygon = transform(transformer_to_wgs84.transform, expanded_polygon_utm)
 
 # 바깥 경계 좌표 리스트로 변환
 expanded_boundary_coords = list(expanded_polygon.exterior.coords)
