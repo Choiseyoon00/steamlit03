@@ -49,7 +49,7 @@ instructions = f"""
 아래 좌표를 사용하여 부경대학교의 부지를 Folium으로 시각화하세요.
 
 경계선 좌표:
-{boundary_coordinates}
+{pknu_boundary_coords}
 """
 
 def show_message(msg):
