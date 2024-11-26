@@ -38,8 +38,12 @@ for i in range(len(pknu_boundary_coords)):
     angle = math.atan2(delta_lat, delta_lon)
     bearing = math.degrees(angle)
 
-    # 현재 점에서 바깥쪽으로 25미터 이동
-    expanded_point = geodesic(meters=25).destination((current_point[0], current_point[1]), bearing)
+    # 각도가 음수인 경우 양수로 변환
+    if bearing < 0:
+        bearing += 360
+
+    # 현재 점에서 바깥쪽으로 50미터 이동
+    expanded_point = geodesic(meters=50).destination((current_point[0], current_point[1]), bearing)
     expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
 
 # 지도 생성
