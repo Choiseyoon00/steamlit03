@@ -78,24 +78,6 @@ expanded_boundary_coords = list(expanded_polygon.exterior.coords)
 
 #---Shapely----------------
 
-
-# 바깥 경계선 좌표 생성 (각 점에서 25m 바깥으로 이동)
-expanded_boundary_coords = []
-
-for i in range(len(pknu_boundary_coords)):
-    current_point = pknu_boundary_coords[i]
-    previous_point = pknu_boundary_coords[i - 1]
-
-    # 두 점 사이의 방향 계산 (중심 각도를 이용해 바깥으로 이동)
-    delta_lat = current_point[0] - previous_point[0]
-    delta_lon = current_point[1] - previous_point[1]
-    angle = math.atan2(delta_lat, delta_lon)  # 두 점 사이의 각도 계산
-    bearing = math.degrees(angle) + 45  # 외곽으로 이동하기 위해 45도 회전
-
-    # 각 점을 바깥쪽으로 50미터 이동
-    expanded_point = geodesic(meters=50).destination((current_point[0], current_point[1]), bearing)
-    expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
-
 # 바깥 경계 점선 추가
 folium.Polygon(
     locations=expanded_boundary_coords,  # 바깥 경계선 좌표
