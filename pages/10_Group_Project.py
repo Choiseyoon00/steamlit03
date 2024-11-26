@@ -3,7 +3,6 @@ import folium
 from streamlit_folium import st_folium
 import openai
 import json
-import tempfile
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 
 
@@ -24,6 +23,9 @@ pknu_boundary_coords = [
     [35.131797, 129.101350],  # 점 7
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
+
+# 부경대 부지 경계선 좌표를 JSON으로 변환
+pknu_boundary_coords_json = json.dumps(pknu_boundary_coords)
 
 # Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
@@ -71,13 +73,12 @@ if "messages" not in st.session_state:
 
 if "assistant" not in st.session_state:
     # 이제 HTML 경로를 `tool_resources`에 추가하여 전달
-    st.session_state.assistant = client.beta.assistants.create(
+        st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
-        instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가 입니다.",
+        instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 좌표 데이터를 기반으로 Folium 지도를 생성하세요.",
         model="gpt-4o-mini",
         tools=[{"type": "code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
-        # 직접 HTML 데이터를 전달할 수 있는 방법으로 설정
-        tool_resources={"map_html": map_html},
+        tool_resources={"boundary_coordinates": pknu_boundary_coords_json},
 )
 
 if "thread" not in st.session_state:
