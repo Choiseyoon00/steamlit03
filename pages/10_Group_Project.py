@@ -3,10 +3,15 @@ import streamlit as st
 
 from streamlit_folium import st_folium
 
+north = 35.1340
+east = 129.1032
+location_name = "Pukyong National University - Daeyeon Campus"
+
+
 # center on Liberty Bell, add marker
-m = folium.Map(location=[35.1340, 129.1032], zoom_start=16)
+m = folium.Map(location=[north, east], zoom_start=16)
 folium.Marker(
-    [35.1340, 129.1032], popup="Pukyong National University (PKNU) - Daeyeon Campus", tooltip="Pukyong National University (PKNU) - Daeyeon Campus"
+    [north, east], popup=location_name, tooltip=location_name
 ).add_to(m)
 
 # call to render Folium map in Streamlit
