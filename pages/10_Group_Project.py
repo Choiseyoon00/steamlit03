@@ -3,7 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import openai
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
-from lib.tools import UPDATE_MAP
+from lib.tools import update_map, UPDATE_MAP
 
 # 부경대 좌표
 pknu_latitude = 35.1329
@@ -37,14 +37,16 @@ out = st_folium(
     height=500,
 )
 
-
 TOOL_FUNCTIONS = {
-    "generate_image": generate_image
+    "generate_image": generate_image,
+    "update_map": update_map_state
 }
 
 FUNCTION_TOOLS_SCHEMA = [
-    SCHEMA_GENERATE_IMAGE
+    SCHEMA_GENERATE_IMAGE,
+    UPDATE_MAP
 ]
+
 
 def show_message(msg):
     if msg['role'] == 'user' or msg['role'] == 'assistant':
