@@ -55,10 +55,25 @@ for i in range(len(pknu_boundary_coords)):
     current_point = pknu_boundary_coords[i]
     previous_point = pknu_boundary_coords[i - 1]
 
-    # 각 점에서 이전 점의 방향을 계산하여 25미터 바깥으로 이동
-    direction = distance(meters=25).destination((current_point[0], current_point[1]), 
-                                                distance(meters=25))
+    # 두 점 사이의 방향 계산 (중간 지점과 각도를 이용하여 바깥으로 이동)
+    midpoint_lat = (current_point[0] + previous_point[0]) / 2
+    midpoint_lon = (current_point[1] + previous_point[1]) / 2
+    midpoint = (midpoint_lat, midpoint_lon)
 
+    # 각 점을 바깥쪽으로 25미터 이동
+    expanded_point = geodesic(meters=25).destination(midpoint, bearing=90)  # 예를 들어 동쪽으로 25m 이동
+    expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
+
+# 바깥 경계 점선 추가
+folium.Polygon(
+    locations=expanded_boundary_coords,  # 바깥 경계선 좌표
+    color="green",  # 선 색깔
+    weight=3,      # 선 두께
+    dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
+    fill=True,  # 폴리곤 내부 채우기 설정
+    fill_color='green',  # 채우기 색상
+    fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
+).add_to(m)
 
 
 
