@@ -44,6 +44,14 @@ FUNCTION_TOOLS_SCHEMA = [
     SCHEMA_GENERATE_IMAGE
 ]
 
+instructions = f"""
+당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 
+아래 좌표를 사용하여 부경대학교의 부지를 Folium으로 시각화하세요.
+
+경계선 좌표:
+{boundary_coordinates}
+"""
+
 def show_message(msg):
     if msg['role'] == 'user' or msg['role'] == 'assistant':
         with st.chat_message(msg['role']):
@@ -75,7 +83,7 @@ if "assistant" not in st.session_state:
     # 이제 HTML 경로를 `tool_resources`에 추가하여 전달
         st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
-        instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 좌표 데이터를 기반으로 Folium 지도를 생성하세요.",
+        instructions=instructions,
         model="gpt-4o-mini",
         tools=[{"type": "code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
         tool_resources={"boundary_coordinates": pknu_boundary_coords_json},
