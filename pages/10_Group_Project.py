@@ -10,6 +10,7 @@ pknu_latitude = 35.1329
 pknu_longitude = 129.1038
 center_coords = [pknu_latitude, pknu_longitude]
 pknu = "Pukyong National University - Daeyeon Campus"
+map_state = "map"
 
 # 부경대학교 부지 경계선 좌표
 pknu_boundary_coords = [
