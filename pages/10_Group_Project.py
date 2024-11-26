@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import openai
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
+from lib.tools import UPDATE_MAP
 
 # 부경대 좌표
 pknu_latitude = 35.1329
@@ -67,7 +68,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "assistant" not in st.session_state:
-    # HTML 경로를 `tool_resources`에 추가하여 전달
         st.session_state.assistant = client.beta.assistants.create(
         name="지도 전문가",
         instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 좌표 데이터를 기반으로 Folium 지도를 생성하세요.",
@@ -79,8 +79,31 @@ if "assistant" not in st.session_state:
 if "thread" not in st.session_state:
     st.session_state.thread = client.beta.threads.create()
 
-# Page
+if map_state not in st.session_state:
+    st.session_state[map_state] = {
+        "latitude": pknu_latitude,
+        "longitude": pknu_longtitude,
+        "zoom": 15,
+    }
 
+
+def update_map_state(latitude, longitude, zoom):
+    """OpenAI tool to update map in-app
+    """
+    st.session_state[map_state] = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "zoom": zoom,
+    }
+    return "Map updated"
+
+tool_to_function = {
+    "update_map": update_map_state,
+}
+
+
+
+# Page
 st.header("Chat")
 
 col1, col2 = st.columns(2)
