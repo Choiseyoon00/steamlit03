@@ -22,14 +22,6 @@ pknu_boundary_coords = [
     [35.13540614195955, 129.10087862006972]   # 다시 시작점으로
 ]
 
-folium.PolyLine(
-    locations=pknu_boundary_coords,  # 경계선 좌표
-    color="green",  # 선 색깔
-    weight=5,      # 선 두께
-    dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
-).add_to(m)
-
-
 # center on PKNU, add marker
 m = folium.Map(
     location=[pknu_latitude, pknu_longitude],
@@ -48,3 +40,11 @@ folium.Marker(
 st_data = st_folium(m, width=725)
 
 m.add_child(folium.LatLngPopup()) 
+
+#점선 추가
+folium.PolyLine(
+    locations=pknu_boundary_coords,  # 경계선 좌표
+    color="green",  # 선 색깔
+    weight=5,      # 선 두께
+    dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
+).add_to(m)
