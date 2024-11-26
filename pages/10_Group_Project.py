@@ -49,7 +49,6 @@ folium.PolyLine(
 
 out = st_folium(
     m,
-    center=center,
     width=1200,
     height=500,
 )
