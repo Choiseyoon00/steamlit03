@@ -39,7 +39,6 @@ folium.Marker(
 
 st_data = st_folium(m, width=725)
 
-m.add_child(folium.LatLngPopup()) 
 
 #점선 추가
 folium.PolyLine(
