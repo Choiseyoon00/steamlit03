@@ -30,6 +30,26 @@ pknu_boundary_coords = [
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
 
 
+#---Shapely---------------
+
+# Shapely를 사용하여 다각형 생성
+polygon = Polygon(pknu_boundary_coords)
+
+# 좌표 변환 함수 (거리 단위를 미터로 사용하기 위해)
+proj_wgs84 = pyproj.CRS('EPSG:4326')
+proj_utm = pyproj.CRS('EPSG:32652')  # 한국 지역에 적합한 UTM 좌표계 (서울 기준)
+project = pyproj.Transformer.from_crs(proj_wgs84, proj_utm, always_xy=True).transform
+reproject = pyproj.Transformer.from_crs(proj_utm, proj_wgs84, always_xy=True).transform
+
+# UTM 좌표계로 변환하여 다각형을 25미터 확장
+polygon_utm = transform(project, polygon)
+expanded_polygon_utm = polygon_utm.buffer(25)
+expanded_polygon = transform(reproject, expanded_polygon_utm)
+
+# 바깥 경계 좌표 리스트로 변환
+expanded_boundary_coords = list(expanded_polygon.exterior.coords)
+
+#---Shapely----------------
 
 
 
@@ -56,27 +76,6 @@ folium.Polygon(
     fill_color='green',  # 채우기 색상
     fill_opacity=0.3  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
-
-#---Shapely---------------
-
-# Shapely를 사용하여 다각형 생성
-polygon = Polygon(pknu_boundary_coords)
-
-# 좌표 변환 함수 (거리 단위를 미터로 사용하기 위해)
-proj_wgs84 = pyproj.CRS('EPSG:4326')
-proj_utm = pyproj.CRS('EPSG:32652')  # 한국 지역에 적합한 UTM 좌표계 (서울 기준)
-project = pyproj.Transformer.from_crs(proj_wgs84, proj_utm, always_xy=True).transform
-reproject = pyproj.Transformer.from_crs(proj_utm, proj_wgs84, always_xy=True).transform
-
-# UTM 좌표계로 변환하여 다각형을 25미터 확장
-polygon_utm = transform(project, polygon)
-expanded_polygon_utm = polygon_utm.buffer(25)
-expanded_polygon = transform(reproject, expanded_polygon_utm)
-
-# 바깥 경계 좌표 리스트로 변환
-expanded_boundary_coords = list(expanded_polygon.exterior.coords)
-
-#---Shapely----------------
 
 # 바깥 경계 점선 추가 (확장된 경계선)
 folium.Polygon(
