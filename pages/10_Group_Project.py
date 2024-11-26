@@ -40,7 +40,7 @@ for i in range(len(pknu_boundary_coords)):
 
     # 각도가 음수인 경우 양수로 변환
     if bearing < 0:
-        bearing += 360
+        bearing += 180
 
     # 현재 점에서 바깥쪽으로 50미터 이동
     expanded_point = geodesic(meters=50).destination((current_point[0], current_point[1]), bearing)
@@ -59,7 +59,7 @@ folium.Marker(
     icon=folium.Icon(color='red', icon='star')
 ).add_to(m)
 
-# 부경대 부지 경계 점선 추가
+# 부경대 부지 경계 점선 추가 파랑
 folium.Polygon(
     locations=pknu_boundary_coords,  # 경계선 좌표
     color="blue",  # 선 색깔
@@ -70,7 +70,7 @@ folium.Polygon(
     fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
-# 바깥 경계 점선 추가 (확장된 경계선)
+# 바깥 경계 점선 추가 (확장된 경계선 초록)
 folium.Polygon(
     locations=expanded_boundary_coords,  # 바깥 경계선 좌표
     color="green",  # 선 색깔
