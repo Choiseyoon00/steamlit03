@@ -2,3 +2,5 @@ openai
 streamlit_chat
 streamlit-folium
 geopy
+shapely
+pyproj
