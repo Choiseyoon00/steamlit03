@@ -6,8 +6,8 @@ from streamlit_folium import st_folium
 
 
 #부경대 좌표와 지도에서 표시
-pknu_latitude = 35.134080249513474
-pknu_longitude = 129.10317348438963
+pknu_latitude = 35.1329
+pknu_longitude = 129.1038
 center_coords = [pknu_latitude, pknu_longitude]
 pknu = "Pukyong National University - Daeyeon Campus"
 
