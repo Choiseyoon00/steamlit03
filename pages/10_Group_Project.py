@@ -12,7 +12,7 @@ pknu = "Pukyong National University - Daeyeon Campus"
 
 # center on PKNU, add marker
 m = folium.Map(
-    location=[latitude, longitude],
+    location=[pknu_latitude, pknu_longitude],
     zoom_start=15
 )
 
@@ -20,7 +20,7 @@ m = folium.Map(
 m.add_child(folium.LatLngPopup()) 
 
 folium.Marker(
-  location=[latitude, longitude],
+  location=[pknu_latitude, pknu_longitude],
   popup=pknu,
   icon=folium.Icon(color='red',icon='star')
 ).add_to(m)
