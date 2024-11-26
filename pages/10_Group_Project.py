@@ -2,11 +2,11 @@
 
 import folium
 import streamlit as st
-import math
+import pyproj
 from streamlit_folium import st_folium
 from shapely.geometry import Polygon
 from shapely.ops import transform
-import pyproj
+
 
 #부경대 좌표와 지도에서 표시
 pknu_latitude = 35.1329
