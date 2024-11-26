@@ -3,7 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import openai
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
-from lib.tools import update_map, UPDATE_MAP
+from lib.tools import UPDATE_MAP
 
 def update_map_state(latitude, longitude, zoom):
     """OpenAI tool to update map in-app
