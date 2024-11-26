@@ -28,6 +28,13 @@ pknu_boundary_coords = [
 # Folium 지도 생성
 m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
 
+# 최종 지도를 Streamlit에 표시
+out = st_folium(
+    m,
+    center=center_coords,
+    width=1200,
+    height=500,
+)
 
 
 st.title("부동산 챗봇")
@@ -201,10 +208,3 @@ if prompt := st.chat_input("What is up?"):
                     show_message(msg)
                     st.session_state.messages.append(msg)
 
-# 최종 지도를 Streamlit에 표시
-out = st_folium(
-    m,
-    center=center_coords,
-    width=1200,
-    height=500,
-)
