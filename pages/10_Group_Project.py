@@ -45,3 +45,12 @@ folium.PolyLine(
     weight=3,      # 선 두께
     dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
 ).add_to(m)
+
+
+out = st_folium(
+    m,
+    feature_group_to_add=fg,
+    center=center,
+    width=1200,
+    height=500,
+)
