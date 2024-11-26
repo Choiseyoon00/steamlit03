@@ -79,7 +79,7 @@ if "assistant" not in st.session_state:
 if "thread" not in st.session_state:
     st.session_state.thread = client.beta.threads.create()
 
-if map_state not in st.session_state:
+if "map_state" not in st.session_state:
     st.session_state[map_state] = {
         "latitude": pknu_latitude,
         "longitude": pknu_longtitude,
