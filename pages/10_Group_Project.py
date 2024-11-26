@@ -5,6 +5,16 @@ import openai
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 from lib.tools import update_map, UPDATE_MAP
 
+def update_map_state(latitude, longitude, zoom):
+    """OpenAI tool to update map in-app
+    """
+    st.session_state[map_state] = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "zoom": zoom,
+    }
+    return "Map updated"
+
 # 부경대 좌표
 pknu_latitude = 35.1329
 pknu_longitude = 129.1038
