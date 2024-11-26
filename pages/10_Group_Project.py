@@ -10,6 +10,26 @@ pknu_latitude = 35.134080249513474
 pknu_longitude = 129.10317348438963
 pknu = "Pukyong National University - Daeyeon Campus"
 
+# 부경대학교 부지 경계선 좌표
+pknu_boundary_coords = [
+    [35.13540614195955, 129.10087862006972],  # 점 1
+    [35.13601590188572, 129.10857328433084],  # 점 2
+    [35.135002467392376, 129.11010486150494],  # 점 3
+    [35.13043402505438, 129.10619708232116],  # 점 4
+    [35.13073134462104, 129.10594147874792],  # 점 5
+    [35.130585105375594, 129.10398518371548],  # 점 6
+    [35.131797828489994, 129.10135082088976],  # 점 7
+    [35.13540614195955, 129.10087862006972]   # 다시 시작점으로
+]
+
+folium.PolyLine(
+    locations=pknu_boundary_coords,  # 경계선 좌표
+    color="green",  # 선 색깔
+    weight=5,      # 선 두께
+    dash_array='5, 5'  # 점선 설정 (숫자는 대시 길이와 간격)
+).add_to(m)
+
+
 # center on PKNU, add marker
 m = folium.Map(
     location=[pknu_latitude, pknu_longitude],
@@ -28,45 +48,3 @@ folium.Marker(
 st_data = st_folium(m, width=725)
 
 m.add_child(folium.LatLngPopup()) 
-
-
-
-#부경대 영역표시
-var feature_group_feature_group_0 = L.featureGroup(
-        {}
-    );
-
-
-function geo_json_feature_group_0_0_styler(feature) {
-    switch(feature.id) {
-        default:
-            return {"color": "#ff3939", "dashArray": "5, 5", "fillOpacity": 0, "opacity": 1, "weight": 3};
-    }
-}
-
-function geo_json_feature_group_0_0_onEachFeature(feature, layer) {
-    layer.on({
-    });
-};
-var geo_json_feature_group_0_0 = L.geoJson(null, {
-        onEachFeature: geo_json_feature_group_0_0_onEachFeature,
-
-        style: geo_json_feature_group_0_0_styler,
-});
-
-function geo_json_feature_group_0_0_add (data) {
-    geo_json_feature_group_0_0
-        .addData(data);
-}
-    geo_json_feature_group_0_0_add({"bbox": [-122.397759, 37.794712, -122.396171, 37.795695], "features": [{"bbox": [-122.397759, 37.794712, -122.396171, 37.795695], "geometry": {"coordinates": [[[-122.397416, 37.795017], [-122.397137, 37.794712], [-122.396332, 37.794983], [-122.396171, 37.795483], [-122.396858, 37.795695], [-122.397652, 37.795466], [-122.397759, 37.79511], [-122.397416, 37.795017]]], "type": "Polygon"}, "id": "0", "properties": {}, "type": "Feature"}], "type": "FeatureCollection"});
-
-
-
-    geo_json_feature_group_0_0.addTo(feature_group_feature_group_0);
-
-
-    feature_group_feature_group_0.addTo(map_div);
-
-map_div.addLayer(feature_group_feature_group_0);
-window.feature_group = window.feature_group || [];
-window.feature_group.push(feature_group_feature_group_0);
