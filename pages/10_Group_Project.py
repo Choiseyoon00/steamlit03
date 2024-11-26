@@ -3,7 +3,7 @@
 import folium
 import streamlit as st
 from streamlit_folium import st_folium
-import geopy.distance
+from geopy.distance import geopy.distance
 
 
 #부경대 좌표와 지도에서 표시
