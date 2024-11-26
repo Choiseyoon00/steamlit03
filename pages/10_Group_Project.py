@@ -42,12 +42,12 @@ folium.Marker(
 #부경대 부지 경계 점선
 folium.Polygon(
     locations=pknu_boundary_coords,  # 경계선 좌표
-    color="blue",  # 선 색깔
+    color="green",  # 선 색깔
     weight=3,      # 선 두께
     dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
     fill=True,  # 폴리곤 내부 채우기 설정
-    fill_color='blue',  # 채우기 색상
-    fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
+    fill_color='green',  # 채우기 색상
+    fill_opacity=0.3  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
 
@@ -64,21 +64,21 @@ for i in range(len(pknu_boundary_coords)):
     delta_lat = current_point[0] - previous_point[0]
     delta_lon = current_point[1] - previous_point[1]
     angle = math.atan2(delta_lat, delta_lon)  # 두 점 사이의 각도 계산
-    bearing = math.degrees(angle) + 90  # 외곽으로 이동하기 위해 90도 회전
+    bearing = math.degrees(angle) + 45  # 외곽으로 이동하기 위해 45도 회전
 
-    # 각 점을 바깥쪽으로 25미터 이동
-    expanded_point = geodesic(meters=25).destination((current_point[0], current_point[1]), bearing)
+    # 각 점을 바깥쪽으로 50미터 이동
+    expanded_point = geodesic(meters=50).destination((current_point[0], current_point[1]), bearing)
     expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
 
 # 바깥 경계 점선 추가
 folium.Polygon(
     locations=expanded_boundary_coords,  # 바깥 경계선 좌표
-    color="green",  # 선 색깔
+    color="red",  # 선 색깔
     weight=3,      # 선 두께
     dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
     fill=True,  # 폴리곤 내부 채우기 설정
-    fill_color='green',  # 채우기 색상
-    fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
+    fill_color='red',  # 채우기 색상
+    fill_opacity=0.3  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
 ).add_to(m)
 
 
