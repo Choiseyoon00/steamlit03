@@ -23,9 +23,6 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# 지도 생성
-m = folium.Map(location=center_coords, zoom_start=15)
-
 #클릭하면 좌표 표시
 m.add_child(folium.LatLngPopup()) 
 
@@ -49,6 +46,7 @@ folium.PolyLine(
 
 out = st_folium(
     m,
+    center=center_coords,
     width=1200,
     height=500,
 )
