@@ -55,9 +55,14 @@ for i in range(len(pknu_boundary_coords)):
     current_point = pknu_boundary_coords[i]
     previous_point = pknu_boundary_coords[i - 1]
 
-        # 각 점에서 이전 점의 방향을 계산하여 25미터 바깥으로 이동
+    # 각 점에서 이전 점의 방향을 계산하여 25미터 바깥으로 이동
     direction = distance(meters=25).destination((current_point[0], current_point[1]), 
                                                 distance(meters=25))
+
+
+
+
+
 out = st_folium(
     m,
     center=center_coords,
