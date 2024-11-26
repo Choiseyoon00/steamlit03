@@ -77,7 +77,7 @@ if "assistant" not in st.session_state:
         instructions="당신은 지도를 통해 지도 내 장소를 파악하고 이를 편집하는 전문가입니다. 좌표 데이터를 기반으로 Folium 지도를 생성하세요.",
         model="gpt-4o-mini",
         tools=[{"type": "code_interpreter"}] + FUNCTION_TOOLS_SCHEMA,
-        tool_resources={pknu_boundary_coords},
+        tool_resources={"pknu_boundary_coords"},
 )
 
 if "thread" not in st.session_state:
