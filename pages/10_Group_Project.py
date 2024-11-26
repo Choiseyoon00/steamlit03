@@ -1,9 +1,8 @@
-import folium
 import streamlit as st
-import openai
+import folium
 from streamlit_folium import st_folium
-from geopy.distance import geodesic
-import math
+import openai
+import json
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 
 # 부경대 좌표와 지도에서 표시
