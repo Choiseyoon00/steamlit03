@@ -1,3 +1,6 @@
+# 좌표정보를 담아서 assistants에게 instructions로 넘겨주기?
+
+
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
