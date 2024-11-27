@@ -4,6 +4,8 @@ from streamlit import session_state as ss
 import streamlit as st
 import pandas as pd
 
+df = pd.DataFrame(data)
+
 key="AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw"
 
 GOOGLE_API_KEY = key
