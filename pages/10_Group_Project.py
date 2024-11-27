@@ -49,7 +49,7 @@ def set_tile_layout(tile_url, lat, lon, zoom=15):
             zoom=15))
 
 if 'tiles_url' not in ss:
-       ss.tiles_url = get_session_url(AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw)
+       ss.tiles_url = get_session_url(GOOGLE_API_KEY)
 
 fig = go.Figure(layout=set_tile_layout(ss.tiles_url,
                                        df[lat_key].mean(),
