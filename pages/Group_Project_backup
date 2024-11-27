@@ -1,14 +1,14 @@
-import folium
+# 좌표정보를 담아서 assistants에게 instructions로 넘겨주기?
 import streamlit as st
-from streamlit_folium import st_folium
-from geopy.distance import geodesic
-import math
+import json
+from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 
-# 부경대 좌표와 지도에서 표시
+# 부경대 좌표
 pknu_latitude = 35.1329
 pknu_longitude = 129.1038
 center_coords = [pknu_latitude, pknu_longitude]
 pknu = "Pukyong National University - Daeyeon Campus"
+map_state = "map"
 
 # 부경대학교 부지 경계선 좌표
 pknu_boundary_coords = [
@@ -22,63 +22,149 @@ pknu_boundary_coords = [
     [35.135406, 129.100878]   # 다시 시작점으로
 ]
 
-# 바깥 경계선 좌표 생성 (각 좌표에서 25m 바깥으로 이동)
-expanded_boundary_coords = []
-
-for i in range(len(pknu_boundary_coords)):
-    # 현재 좌표와 다음 좌표
-    current_point = pknu_boundary_coords[i]
-    next_point = pknu_boundary_coords[(i + 1) % len(pknu_boundary_coords)]
-
-    # 현재 좌표에서 다음 좌표로 가는 방향의 각도 계산
-    delta_lat = next_point[0] - current_point[0]
-    delta_lon = next_point[1] - current_point[1]
-    angle = math.atan2(delta_lat, delta_lon)
-    bearing = math.degrees(angle)
+st.title("챗봇_test")
 
 
-    # 현재 점에서 바깥쪽으로 100미터 이동
-    expanded_point = geodesic(meters=100).destination((current_point[0], current_point[1]), bearing)
-    expanded_boundary_coords.append([expanded_point.latitude, expanded_point.longitude])
+TOOL_FUNCTIONS = {
+    "generate_image": generate_image
+}
 
-# 지도 생성
-m = folium.Map(location=[pknu_latitude, pknu_longitude], zoom_start=15)
+FUNCTION_TOOLS_SCHEMA = [
+    SCHEMA_GENERATE_IMAGE
+]
 
-# 클릭하면 좌표 표시
-m.add_child(folium.LatLngPopup())
-
-# 부경대 마커 추가
-folium.Marker(
-    location=[pknu_latitude, pknu_longitude],
-    popup=pknu,
-    icon=folium.Icon(color='red', icon='star')
-).add_to(m)
-
-# 부경대 부지 경계 점선 추가
-folium.Polygon(
-    locations=pknu_boundary_coords,  # 경계선 좌표
-    color="blue",  # 선 색깔
-    weight=3,      # 선 두께
-    dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
-    fill=True,  # 폴리곤 내부 채우기 설정
-    fill_color='blue',  # 채우기 색상
-    fill_opacity=0.2  # 채우기 투명도 (0.0에서 1.0, 낮을수록 더 투명)
-).add_to(m)
-
-# 바깥 경계 점선 추가 (확장된 경계선)
-folium.Polygon(
-    locations=expanded_boundary_coords,  # 바깥 경계선 좌표
-    color="green",  # 선 색깔
-    weight=3,       # 선 두께
-    dash_array='5, 5',  # 점선 설정 (숫자는 대시 길이와 간격)
-    fill=False      # 바깥 경계는 채우지 않음
-).add_to(m)
+def show_message(msg):
+    if msg['role'] == 'user' or msg['role'] == 'assistant':
+        with st.chat_message(msg['role']):
+            st.markdown(msg["content"])
+    elif msg['role'] == 'code':
+        with st.chat_message('assistant'):
+            with st.expander("Show codes"):
+                st.code(msg["content"], language='python')
+    elif msg['role'] == 'image_url':
+        with st.chat_message('assistant'):
+            st.markdown(f"![]({msg['content']})")
+    elif msg['role'] == 'image_file':
+        with st.chat_message('assistant'):
+            st.image(msg['content'])
 
 
-# 최종 지도를 Streamlit에 표시
-out = st_folium(
-    m,
-    center=center_coords,
-    width=1200,
-    height=500,
-)
+# Initialization
+
+client = st.session_state.get('openai_client', None)
+if client is None:
+    if st.button("API Key를 입력하세요."):
+        st.switch_page("pages/1_Setting.py")
+    st.stop()
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "assistant" not in st.session_state:
+    st.session_state.assistant = client.beta.assistants.create(
+        name="Assistant",
+        model="gpt-4o-mini",
+        tools=[{"type":"code_interpreter"}] + FUNCTION_TOOLS_SCHEMA
+    )
+
+if "thread" not in st.session_state:
+    st.session_state.thread = client.beta.threads.create()
+
+
+# Page
+
+st.header("Chat")
+
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("Clear (Start a new chat)"):
+        st.session_state.messages = []
+        del st.session_state.thread
+with col2:
+    if st.button("Leave"):
+        st.session_state.messages = []
+        del st.session_state.thread
+        del st.session_state.assistant
+
+# previous chat
+for msg in st.session_state.messages:
+    show_message(msg)
+
+# user prompt, assistant response
+if prompt := st.chat_input("What is up?"):
+    msg = {"role":"user", "content":prompt}
+    show_message(msg)
+    st.session_state.messages.append(msg)
+
+    # assistant api - get response
+    thread = st.session_state.thread
+    assistant = st.session_state.assistant
+
+    client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=prompt
+    )
+    run = client.beta.threads.runs.create_and_poll(
+        thread_id=thread.id,
+        assistant_id=assistant.id
+    )
+
+    while run.status == 'requires_action':
+        tool_calls = run.required_action.submit_tool_outputs.tool_calls
+        tool_outputs = []
+        for tool in tool_calls:
+            func_name = tool.function.name
+            kwargs = json.loads(tool.function.arguments)
+            output = None
+            if func_name in TOOL_FUNCTIONS:
+                output = TOOL_FUNCTIONS[func_name](**kwargs)
+            tool_outputs.append(
+                {
+                    "tool_call_id": tool.id,
+                    "output": str(output)
+                }
+            )
+        run = client.beta.threads.runs.submit_tool_outputs_and_poll(
+            thread_id=thread.id,
+            run_id=run.id,
+            tool_outputs=tool_outputs
+        )
+            
+    # assistant messages - text, image_url, image_file
+    if run.status == 'completed':
+        api_response = client.beta.threads.messages.list(
+            thread_id=thread.id,
+            run_id=run.id,
+            order="asc"
+        )
+        for data in api_response.data:
+            for content in data.content:
+                if content.type == 'text':
+                    response = content.text.value
+                    msg = {"role":"assistant","content":response}
+                elif content.type == 'image_url':
+                    url = content.image_url.url
+                    msg = {"role":"image_url","content":url}
+                elif content.type == 'image_file':
+                    file_id = content.image_file.file_id
+                    # load file
+                    image_data = client.files.content(file_id)
+                    msg = {"role":"image_file","content":image_data.read()}
+                show_message(msg)
+                st.session_state.messages.append(msg)
+
+    # code interpreter tool call info
+    run_steps = client.beta.threads.runs.steps.list(
+        thread_id=thread.id,
+        run_id=run.id,
+        order='asc'
+    )
+    for run_step in run_steps.data:
+        if run_step.step_details.type == 'tool_calls':
+            for tool_call in run_step.step_details.tool_calls:
+                if tool_call.type == 'code_interpreter':
+                    code = tool_call.code_interpreter.input
+                    msg = {"role":"code","content":code}
+                    show_message(msg)
+                    st.session_state.messages.append(msg)
