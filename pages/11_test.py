@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 from streamlit import session_state as ss
 import streamlit as st
 
+key=AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw
 
 def get_session_url(api_key):
     create_session_url = "https://tile.googleapis.com/v1/createSession"
