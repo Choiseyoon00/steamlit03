@@ -2,6 +2,7 @@ import requests
 import plotly.graph_objects as go
 from streamlit import session_state as ss
 import streamlit as st
+import pandas as pd
 
 key="AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw"
 
