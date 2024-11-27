@@ -2,25 +2,71 @@
 import streamlit as st
 import json
 from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
+import requests
+import plotly.graph_objects as go
+from streamlit import session_state as ss
 
-# 부경대 좌표
-pknu_latitude = 35.1329
-pknu_longitude = 129.1038
-center_coords = [pknu_latitude, pknu_longitude]
-pknu = "Pukyong National University - Daeyeon Campus"
-map_state = "map"
 
-# 부경대학교 부지 경계선 좌표
-pknu_boundary_coords = [
-    [35.135406, 129.100878],  # 점 1
-    [35.136015, 129.108573],  # 점 2
-    [35.135002, 129.110104],  # 점 3
-    [35.130434, 129.106197],  # 점 4
-    [35.130731, 129.105941],  # 점 5
-    [35.130585, 129.103985],  # 점 6
-    [35.131797, 129.101350],  # 점 7
-    [35.135406, 129.100878]   # 다시 시작점으로
-]
+def get_session_url(api_key):
+    create_session_url = "https://tile.googleapis.com/v1/createSession"
+
+    payload = {
+        "mapType": "satellite",
+        "language": "en-US",
+        "region": "US",
+        }
+
+    headers = {'Content-Type': 'application/json'}
+
+    response = requests.post(create_session_url,
+                             json=payload,
+                             headers=headers,
+                             params={'key': api_key})
+
+    if response.status_code == 200:
+        session_token = response.json().get('session')
+        print("Session token:", session_token)
+    else:
+        print("Failed to create session:", response.text)
+
+    return ("https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session="
+            + session_token
+            + "&key="
+            + api_key)
+        
+def set_tile_layout(tile_url, lat, lon, zoom=15):
+    return go.Layout(
+        width=640,
+        height=640,
+        mapbox=dict(
+            style="white-bg",
+            layers=[{"below": 'traces',
+                     "sourcetype": "raster",
+                     "sourceattribution": "Google",
+                     "source": [tile_url] }],
+            center=dict(lat=lat,
+                        lon=lon),
+            zoom=15))
+
+if 'tiles_url' not in ss:
+       ss.tiles_url = get_session_url(AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw)
+
+fig = go.Figure(layout=set_tile_layout(ss.tiles_url,
+                                       df[lat_key].mean(),
+                                       df[lon_key].mean()))
+
+fig.add_trace(go.Scattermapbox(
+          mode="markers",
+          lat=df[lat_key],
+          lon=df[lon_key],
+          name='Data'))
+
+fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+st.plotly_chart(fig)
+
+
+
 
 st.title("챗봇_test")
 
