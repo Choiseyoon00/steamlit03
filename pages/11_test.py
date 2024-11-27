@@ -10,7 +10,7 @@ GOOGLE_API_KEY = key
 
 
 def get_session_url(api_key):
-    create_session_url = "https://tile.googleapis.com/v1/createSession"
+    create_session_url = "https://tile.googleapis.com/v1/createSession?key=AIzaSyAYbxJm_JxPYaoxw0c-bsP1hDONYcFnQrw"
 
     payload = {
         "mapType": "satellite",
