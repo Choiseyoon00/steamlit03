@@ -1,4 +1,6 @@
 import streamlit as st
+import json
+from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
 
 @st.cache_data
 def generate_image(prompt):
