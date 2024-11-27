@@ -24,6 +24,15 @@ pknu_boundary_coords = [
 
 st.title("챗봇_test")
 
+
+TOOL_FUNCTIONS = {
+    "generate_image": generate_image
+}
+
+FUNCTION_TOOLS_SCHEMA = [
+    SCHEMA_GENERATE_IMAGE
+]
+
 def show_message(msg):
     if msg['role'] == 'user' or msg['role'] == 'assistant':
         with st.chat_message(msg['role']):
