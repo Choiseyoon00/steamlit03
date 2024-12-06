@@ -6,3 +6,4 @@ pyproj
 plotly
 gtts
 googletrans
+pydub
