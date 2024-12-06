@@ -1,9 +1,7 @@
 openai
 streamlit_chat
-streamlit-folium
-shapely
 pyproj
 plotly
 gtts
 googletrans
-pydub
+
