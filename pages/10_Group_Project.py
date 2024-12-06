@@ -1,216 +1,180 @@
-# 좌표정보를 담아서 assistants에게 instructions로 넘겨주기?
 import streamlit as st
+import openai
+import datetime
+import pandas as pd
+import random
 import json
-from lib.tools import generate_image, SCHEMA_GENERATE_IMAGE
-import requests
-import plotly.graph_objects as go
-from streamlit import session_state as ss
+from gtts import gTTS
+import os
+import time
+from googletrans import Translator
+from pydub import AudioSegment
+from pydub.playback import play
 
+# Set default language to Korean
+st.set_page_config(page_title="일정 관리 앱", page_icon="🗓️", layout="centered")
 
-def get_session_url(api_key):
-    create_session_url = "https://tile.googleapis.com/v1/createSession"
+# OpenAI Key input
+openai.api_key = st.text_input('OpenAI API 키를 입력하세요', type='password')
 
-    payload = {
-        "mapType": "satellite",
-        "language": "en-US",
-        "region": "US",
-        }
+# Function for multilingual support
+def translate_text(text, target_language='ko'):
+    translator = Translator()
+    return translator.translate(text, dest=target_language).text
 
-    headers = {'Content-Type': 'application/json'}
+# Function to convert text to speech
+def text_to_speech(text, lang='ko'):
+    tts = gTTS(text=text, lang=lang)
+    audio_file = f"audio_{random.randint(1, 10000)}.mp3"
+    tts.save(audio_file)
+    audio = AudioSegment.from_mp3(audio_file)
+    play(audio)
+    os.remove(audio_file)
 
-    response = requests.post(create_session_url,
-                             json=payload,
-                             headers=headers,
-                             params={'key': api_key})
+# AI-based schedule analysis using OpenAI GPT-3.5-turbo
+def ai_schedule_analysis(user_schedule):
+    try:
+        prompt = f"다음 일정을 분석하고 개선하거나 최적화할 방법을 제시하세요:\n{user_schedule}"
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", 
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=1000
+        )
+        analysis = response['choices'][0]['message']['content'].strip()
+        return analysis
+    except Exception as e:
+        st.error(f"OpenAI API 오류: {e}")
+        return "AI 분석 실패."
 
-    if response.status_code == 200:
-        session_token = response.json().get('session')
-        print("Session token:", session_token)
+# AI-based report generation using OpenAI GPT-3.5-turbo
+def ai_generate_report(schedule):
+    try:
+        prompt = f"다음 일정을 기반으로 주간 또는 월간 보고서를 작성하세요:\n{schedule}"
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", 
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=1500
+        )
+        report = response['choices'][0]['message']['content'].strip()
+        return report
+    except Exception as e:
+        st.error(f"보고서 생성 중 오류 발생: {e}")
+        return "보고서 생성 실패."
+
+# Function to suggest rest times
+def suggest_rest_time(schedule):
+    busy_hours = sum([item['duration'] for item in schedule if item['type'] == 'work'])
+    if busy_hours > 6:
+        return "오늘은 바쁜 일정입니다! 1-2시간마다 짧은 휴식을 고려하세요."
     else:
-        print("Failed to create session:", response.text)
+        return "일정이 균형 잡혀 있습니다. 잘 하고 계십니다!"
 
-    return ("https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session="
-            + session_token
-            + "&key="
-            + api_key)
-        
-def set_tile_layout(tile_url, lat, lon, zoom=15):
-    return go.Layout(
-        width=640,
-        height=640,
-        mapbox=dict(
-            style="white-bg",
-            layers=[{"below": 'traces',
-                     "sourcetype": "raster",
-                     "sourceattribution": "Google",
-                     "source": [tile_url] }],
-            center=dict(lat=lat,
-                        lon=lon),
-            zoom=15))
+# Schedule management
+if 'schedule' not in st.session_state:
+    st.session_state.schedule = []
 
-if 'tiles_url' not in ss:
-       ss.tiles_url = get_session_url(GOOGLE_API_KEY)
+# UI to add a task
+with st.form("schedule_form"):
+    task_name = st.text_input("작업 이름")
+    task_type = st.selectbox("작업 유형", ["업무", "회의", "휴식", "기타"])
+    task_duration = st.number_input("소요 시간 (분)", min_value=0, max_value=1440, value=60)
+    task_date = st.date_input("작업 날짜", value=datetime.date.today())  # Date Picker
+    task_time = st.time_input("작업 시간", value=datetime.time(9, 0))
 
-fig = go.Figure(layout=set_tile_layout(ss.tiles_url,
-                                       df[lat_key].mean(),
-                                       df[lon_key].mean()))
+    submitted = st.form_submit_button("작업 추가")
+    if submitted:
+        task = {
+            "name": task_name,
+            "type": task_type,
+            "duration": task_duration,
+            "date": task_date.strftime('%Y-%m-%d'),  # Store date as string
+            "time": task_time.strftime('%H:%M')
+        }
+        st.session_state.schedule.append(task)
+        st.success(f"{task_name}이(가) {task_date} {task_time}에 추가되었습니다.")
 
-fig.add_trace(go.Scattermapbox(
-          mode="markers",
-          lat=df[lat_key],
-          lon=df[lon_key],
-          name='Data'))
+# Display schedule
+st.subheader("당신의 일정")
+schedule_df = pd.DataFrame(st.session_state.schedule)
+st.table(schedule_df)
 
-fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+# Schedule analysis and optimization
+if st.button("일정 분석 및 최적화"):
+    user_schedule = "\n".join([f"{task['date']} {task['time']} - {task['name']} ({task['type']}, {task['duration']}분)" for task in st.session_state.schedule])
+    analysis = ai_schedule_analysis(user_schedule)
+    st.write(f"AI 분석: {analysis}")
 
-st.plotly_chart(fig)
+# Fatigue analysis
+if st.button("피로 분석"):
+    rest_suggestions = suggest_rest_time(st.session_state.schedule)
+    st.write(f"휴식 제안: {rest_suggestions}")
 
+# Notifications system
+notification_methods = ['소리', '진동', '푸시 알림']
+notification_choice = st.selectbox("알림 방법 선택", notification_methods)
 
+if notification_choice == "소리":
+    if st.button("음성 알림 듣기"):
+        text_to_speech("이것은 당신의 음성 알림입니다. 작업을 잊지 마세요!")
+    else:
+        st.write("음성 알림 버튼을 눌러주세요.")
 
+# Weekly/Monthly Reports
+report_choice = st.radio("보고서 생성", ['주간 보고서', '월간 보고서'])
+if st.button("보고서 생성"):
+    # Generate AI-based report based on the schedule
+    schedule_text = "\n".join([f"{task['date']} {task['time']} - {task['name']} ({task['type']}, {task['duration']}분)" for task in st.session_state.schedule])
+    report = ai_generate_report(schedule_text)
+    st.write(f"AI 보고서: {report}")
 
-st.title("챗봇_test")
+# Time Management Challenge Feature
+challenge_goal = st.text_input("시간 관리 도전 설정", "이번 주 회의 3개 완료하기")
+if st.button("도전 시작"):
+    st.session_state.challenge_goal = challenge_goal
+    st.success(f"도전 시작: {challenge_goal}")
 
+# Rest Management Feature
+rest_choice = st.radio("휴식 관리", ['휴식 제안 받기', '휴식 알림 설정'])
+if rest_choice == '휴식 제안 받기':
+    st.write(suggest_rest_time(st.session_state.schedule))
+else:
+    rest_time = st.time_input("휴식 시간 설정", value=datetime.time(15, 0))
+    st.session_state.schedule.append({
+        "name": "휴식",
+        "type": "rest",
+        "duration": 15,
+        "date": datetime.date.today().strftime('%Y-%m-%d'),  # Default to today's date for rest
+        "time": rest_time.strftime('%H:%M')
+    })
+    st.success(f"{rest_time}에 휴식 시간이 추가되었습니다.")
 
-TOOL_FUNCTIONS = {
-    "generate_image": generate_image
-}
+# Customizable Themes (Simple example with color)
+theme_color = st.selectbox("테마 색상 선택", ["라이트", "다크"])
+if theme_color == "다크":
+    st.markdown("""
+        <style>
+            body {
+                background-color: #333;
+                color: white;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+            body {
+                background-color: white;
+                color: black;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
-FUNCTION_TOOLS_SCHEMA = [
-    SCHEMA_GENERATE_IMAGE
-]
-
-def show_message(msg):
-    if msg['role'] == 'user' or msg['role'] == 'assistant':
-        with st.chat_message(msg['role']):
-            st.markdown(msg["content"])
-    elif msg['role'] == 'code':
-        with st.chat_message('assistant'):
-            with st.expander("Show codes"):
-                st.code(msg["content"], language='python')
-    elif msg['role'] == 'image_url':
-        with st.chat_message('assistant'):
-            st.markdown(f"![]({msg['content']})")
-    elif msg['role'] == 'image_file':
-        with st.chat_message('assistant'):
-            st.image(msg['content'])
-
-
-# Initialization
-
-client = st.session_state.get('openai_client', None)
-if client is None:
-    if st.button("API Key를 입력하세요."):
-        st.switch_page("pages/1_Setting.py")
-    st.stop()
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "assistant" not in st.session_state:
-    st.session_state.assistant = client.beta.assistants.create(
-        name="Assistant",
-        model="gpt-4o-mini",
-        tools=[{"type":"code_interpreter"}] + FUNCTION_TOOLS_SCHEMA
-    )
-
-if "thread" not in st.session_state:
-    st.session_state.thread = client.beta.threads.create()
-
-
-# Page
-
-st.header("Chat")
-
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("Clear (Start a new chat)"):
-        st.session_state.messages = []
-        del st.session_state.thread
-with col2:
-    if st.button("Leave"):
-        st.session_state.messages = []
-        del st.session_state.thread
-        del st.session_state.assistant
-
-# previous chat
-for msg in st.session_state.messages:
-    show_message(msg)
-
-# user prompt, assistant response
-if prompt := st.chat_input("What is up?"):
-    msg = {"role":"user", "content":prompt}
-    show_message(msg)
-    st.session_state.messages.append(msg)
-
-    # assistant api - get response
-    thread = st.session_state.thread
-    assistant = st.session_state.assistant
-
-    client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=prompt
-    )
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread.id,
-        assistant_id=assistant.id
-    )
-
-    while run.status == 'requires_action':
-        tool_calls = run.required_action.submit_tool_outputs.tool_calls
-        tool_outputs = []
-        for tool in tool_calls:
-            func_name = tool.function.name
-            kwargs = json.loads(tool.function.arguments)
-            output = None
-            if func_name in TOOL_FUNCTIONS:
-                output = TOOL_FUNCTIONS[func_name](**kwargs)
-            tool_outputs.append(
-                {
-                    "tool_call_id": tool.id,
-                    "output": str(output)
-                }
-            )
-        run = client.beta.threads.runs.submit_tool_outputs_and_poll(
-            thread_id=thread.id,
-            run_id=run.id,
-            tool_outputs=tool_outputs
-        )
-            
-    # assistant messages - text, image_url, image_file
-    if run.status == 'completed':
-        api_response = client.beta.threads.messages.list(
-            thread_id=thread.id,
-            run_id=run.id,
-            order="asc"
-        )
-        for data in api_response.data:
-            for content in data.content:
-                if content.type == 'text':
-                    response = content.text.value
-                    msg = {"role":"assistant","content":response}
-                elif content.type == 'image_url':
-                    url = content.image_url.url
-                    msg = {"role":"image_url","content":url}
-                elif content.type == 'image_file':
-                    file_id = content.image_file.file_id
-                    # load file
-                    image_data = client.files.content(file_id)
-                    msg = {"role":"image_file","content":image_data.read()}
-                show_message(msg)
-                st.session_state.messages.append(msg)
-
-    # code interpreter tool call info
-    run_steps = client.beta.threads.runs.steps.list(
-        thread_id=thread.id,
-        run_id=run.id,
-        order='asc'
-    )
-    for run_step in run_steps.data:
-        if run_step.step_details.type == 'tool_calls':
-            for tool_call in run_step.step_details.tool_calls:
-                if tool_call.type == 'code_interpreter':
-                    code = tool_call.code_interpreter.input
-                    msg = {"role":"code","content":code}
-                    show_message(msg)
-                    st.session_state.messages.append(msg)
+# Show the current schedule
+st.subheader("현재 일정:")
+st.write(st.session_state.schedule)
